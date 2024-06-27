@@ -2,9 +2,8 @@
 #SBATCH --job-name=v2g_annotate
 #SBATCH --output=variants_anno.tsv
 #SBATCH --partition=cpuq
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=10
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
 #SBATCH --mem=50G
 #SBATCH --time=00:30:00
 
