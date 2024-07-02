@@ -1,5 +1,6 @@
 import dask.dataframe as dd
 from dask.distributed import LocalCluster
+import numpy as np
 import argparse
 
 parser = argparse.ArgumentParser(
@@ -70,7 +71,32 @@ def main():
 	
 	#Join the two tables
 	filtered_ddf = ddf_select[ddf_select['SNP_id'].isin(snp_values)].compute()
-	filtered_ddf.to_csv(args.out, sep = "\t")
+      
+	#Aggregate data produced
+	def aggregate_list(values, type_filter, filtered_ddf):
+		filtered_values = list(values[filtered_ddf['type_id'] == type_filter])
+		return filtered_values if filtered_values else np.nan
+
+	grouped_filtered = filtered_ddf.groupby(['SNP_id', 'gene_id']).agg(
+    	chr_id=('chr_id', 'first'),
+    	position=('position', 'first'),
+    	ref_allele=('ref_allele', 'first'),
+    	alt_allele=('alt_allele', 'first'),
+    	distance_score=('distance_score', 'first'),
+    	fpred_max=('fpred_max_score', 'max'),
+    	fpred_label=('fpred_max_label', 'first'),
+    	phic_scores=('qtl_score', lambda x: aggregate_list(x, 'phic', filtered_ddf)),
+    	phic_features=('feature', lambda x: aggregate_list(x, 'phic', filtered_ddf)),
+    	eqtl_scores=('qtl_score', lambda x: aggregate_list(x, 'eqtl', filtered_ddf)),
+    	eqtl_features=('feature', lambda x: aggregate_list(x, 'eqtl', filtered_ddf)),
+    	pqtl_scores=('qtl_score', lambda x: aggregate_list(x, 'pqtl', filtered_ddf)),
+    	pqtl_features=('feature', lambda x: aggregate_list(x, 'pqtl', filtered_ddf)),
+    	sqtl_scores=('qtl_score', lambda x: aggregate_list(x, 'sqtl', filtered_ddf)),
+    	sqtl_features=('feature', lambda x: aggregate_list(x, 'sqtl', filtered_ddf)),
+    	overall_scores=('overall_score', 'first'),
+	).reset_index()
+	
+	grouped_filtered.to_csv(args.out, sep = "\t")
 
 
 if __name__ == '__main__':
