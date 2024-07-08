@@ -1,6 +1,4 @@
 pippo
-<<<<<<< HEAD
 qwerty
-=======
 ghipuershgir
->>>>>>> 3ab894b8f41d0fbe11e96dcdfbc81ff05948dacd
+lpoi
