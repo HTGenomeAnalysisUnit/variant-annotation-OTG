@@ -37,7 +37,6 @@ SNP_id
 python v2g_dask_query.py -t <variant-table> -o <output-file>
 <details>
 <summary>Example of table with -t:</summary>
-<br>
 ```
 head tests/variants_query_table.txt
 chr_id,position,ref_allele,alt_allele
