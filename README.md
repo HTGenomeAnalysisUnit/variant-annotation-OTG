@@ -4,9 +4,22 @@
 Tools for annotating variants using OTG data 
 
 ## Usage
-To run the program I need to use the HPC sbatch run like indicated in the script scheduler_annotation.sbatch:
+To run the program you need to use a sbatch script in the HPC. An example of sbatch script is provided in the script folder like below
 
-sbatch scheduler_annotation.sbatch
+```
+cat script/scheduler_annotation.sbatch
+#!/bin/bash
+#SBATCH --job-name=v2g_annotate
+#SBATCH --output=logfile_sbatch.txt
+#SBATCH --partition=cpuq
+#SBATCH --cpus-per-task=5
+#SBATCH --mem=10G
+#SBATCH --time=00:40:00
+
+source /ssu/gassu/miniconda3/etc/profile.d/conda.sh
+conda activate tiledb
+python v2g_dask_query.py -i variants_query.txt -o variants_anno_out.tsv
+```
 
 This needs to be modified adding the preferred input and output files. The parameters used can be either using the options:
 
