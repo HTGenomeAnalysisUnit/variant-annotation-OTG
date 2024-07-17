@@ -3,14 +3,20 @@ from dask.distributed import LocalCluster
 import numpy as np
 import argparse
 import pandas as pd
-
+import sys
 parser = argparse.ArgumentParser(
                     prog='OTG query v2g',
                     description='This program query the OTG variant-to-gene database for a set of variants and gives back the annotations')
 
-parser.add_argument('-i', '--input',
+parser.add_argument('-v', '--variants_query',
                     type = str,
-                    help = 'Set of variants to investigate') 
+                    help = 'Set of variants to investigate in the format chr_pos_ref_alt',
+					default = False) 
+
+parser.add_argument('-t', '--table_query',
+                    type = str,
+                    help = 'Set of variants to investigate from a table',
+					default = False) 
 
 parser.add_argument('-o', '--out',
                     type = str,
@@ -67,8 +73,16 @@ def main():
 	ddf_select["SNP_id"] = ddf_select["chr_id"] + "_" + ddf_select["position"].astype(str)  + "_" + ddf_select["ref_allele"]  + "_"  + ddf_select["alt_allele"]
 	
 	#Read variants to query and convert to Dask series
-	variant_query = dd.read_csv(args.input)
-	snp_values = variant_query['SNP_id'].compute()
+	if(args.variants_query):
+		variant_query = dd.read_csv(args.variants_query)
+		snp_values = variant_query['SNP_id'].compute()
+	elif (args.table_query):
+		variant_query = dd.read_csv(args.table_query)
+		variant_query["SNP_id"] = variant_query["chr_id"].astype(str) + "_" + variant_query["position"].astype(str)  + "_" + variant_query["ref_allele"]  + "_"  + variant_query["alt_allele"]
+		snp_values = variant_query['SNP_id'].compute()
+	else:
+		
+		sys.exit("no query variants specified. Please supply a set of variants using the -v or -t options")
 	
 	#Join the two tables
 	filtered_ddf = ddf_select[ddf_select['SNP_id'].isin(snp_values)].compute()
