@@ -14,7 +14,7 @@ This needs to be modified adding the preferred input and output files. The param
 
 Input can be given using either the -v or -t option:
 
-python v2g_dask_query.py -v <variant-table> -o <output-file>
+```python v2g_dask_query.py -v <variant-table> -o <output-file>```
 <details>
 <summary>Example of table with -v:</summary>
 <pre>
@@ -32,7 +32,7 @@ SNP_id
 </pre>
 </details>
 
-python v2g_dask_query.py -t <variant-table> -o <output-file>
+```python v2g_dask_query.py -t <variant-table> -o <output-file>```
 <details>
 <summary>Example of table with -t:</summary>
 <pre>
