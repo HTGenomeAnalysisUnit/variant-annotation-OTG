@@ -19,7 +19,7 @@ python v2g_dask_query.py -v <variant-table> -o <output-file>
 <summary>Example of table with -v:</summary>
 <br>
 Example of table:
-```
+<pre>
 head tests/variants_query.txt
 SNP_id
 1_154453788_C_T
@@ -31,7 +31,7 @@ SNP_id
 1_8447713_G_A
 1_9283562_C_T
 1_9478595_G_C
-```
+</pre>
 </details>
 
 python v2g_dask_query.py -t <variant-table> -o <output-file>
