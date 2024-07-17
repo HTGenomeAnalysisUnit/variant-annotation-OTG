@@ -79,6 +79,11 @@ def main():
 		if not filtered_group.empty:
 			qtl_scores = filtered_group['qtl_score'].tolist()
 			features = filtered_group['feature'].tolist()
+			qtl_scores = [np.nan if x is None else x for x in qtl_scores]
+			features = [np.nan if x is None else x for x in features]
+			sorted_indices = np.argsort(qtl_scores)[::-1]  # Descending order
+			qtl_scores = [qtl_scores[i] for i in sorted_indices]
+			features = [features[i] for i in sorted_indices]
 			max_score_idx = np.nanargmax(qtl_scores)
 			max_qtl_score = qtl_scores[max_score_idx]
 			max_qtl_feature = features[max_score_idx]
@@ -130,6 +135,7 @@ def main():
 
 	# Group by SNP_id and gene_id and apply the custom aggregation function
 	grouped_filtered = filtered_ddf.groupby(['SNP_id', 'gene_id']).apply(custom_agg).reset_index()
+	grouped_filtered = grouped_filtered.replace(np.NaN,'Na')
 	grouped_filtered.to_csv(args.out, sep = "\t", index = False)
 
 if __name__ == '__main__':
