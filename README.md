@@ -6,8 +6,8 @@ Tools for annotating variants using OTG data
 ## Usage
 To run the program you need to use a sbatch script in the HPC. An example of sbatch script is provided in the script folder like below
 
+```cat script/scheduler_annotation.sbatch```
 ```
-cat script/scheduler_annotation.sbatch
 #!/bin/bash
 #SBATCH --job-name=v2g_annotate
 #SBATCH --output=logfile_sbatch.txt
