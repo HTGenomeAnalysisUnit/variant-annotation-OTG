@@ -8,13 +8,46 @@ To run the program I need to use the HPC sbatch run like indicated in the script
 
 sbatch scheduler_annotation.sbatch
 
-This needs to be modified adding the preferred input and output files using the parameters -i and -o
+This needs to be modified adding the preferred input and output files. The parameters used can be either using the options:
 
-To run the program from a srun I can use the script v2g_dask_query.py after loading the tiledb conda environment:
+## Input
+
+Input can be given using either the -v or -t option:
+
+-v variants table like the one showed below:
+```
+head tests/variants_query.txt
+SNP_id
+1_154453788_C_T
+1_1022868_A_G
+1_2211079_A_C
+1_2293397_G_A
+1_6568959_A_AG
+1_8094061_TG_T
+1_8447713_G_A
+1_9283562_C_T
+1_9478595_G_C
+```
+-t table 
+```
+head tests/variants_query_table.txt
+chr_id,position,ref_allele,alt_allele
+1,154453788,C,T
+1,1022868,A,G
+1,2211079,A,C
+1,2293397,G,A
+1,6568959,A,AG
+1,8094061,TG,T
+1,8447713,G,A
+1,9283562,C,T
+1,9478595,G,C
+```
+
+To run the program from a srun you can use also the script v2g_dask_query.py after loading the tiledb conda environment:
 
 conda activate tiledb
 
-python v2g_dask_query.py -i <input-file> -o <output-file>
+python v2g_dask_query.py -t <input-table> -o <output-file>
 
 ## Output
 
