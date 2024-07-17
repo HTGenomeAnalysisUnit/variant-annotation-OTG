@@ -14,7 +14,11 @@ This needs to be modified adding the preferred input and output files. The param
 
 Input can be given using either the -v or -t option:
 
--v variants table like the one showed below:
+python v2g_dask_query.py -v <variant-table> -o <output-file>
+<details>
+<summary>Example of table with -v:</summary>
+<br>
+Example of table:
 ```
 head tests/variants_query.txt
 SNP_id
@@ -28,7 +32,12 @@ SNP_id
 1_9283562_C_T
 1_9478595_G_C
 ```
--t table 
+</details>
+
+python v2g_dask_query.py -t <variant-table> -o <output-file>
+<details>
+<summary>Example of table with -t:</summary>
+<br>
 ```
 head tests/variants_query_table.txt
 chr_id,position,ref_allele,alt_allele
@@ -42,6 +51,7 @@ chr_id,position,ref_allele,alt_allele
 1,9283562,C,T
 1,9478595,G,C
 ```
+</details>
 
 To run the program from a srun you can use also the script v2g_dask_query.py after loading the tiledb conda environment:
 
