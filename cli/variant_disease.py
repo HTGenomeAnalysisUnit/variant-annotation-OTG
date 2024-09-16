@@ -49,4 +49,4 @@ def variant_disease(ctx,  out: str, gnomad_af: str, tag: bool):
     filtered_ddf_lead_variant_index_df = filtered_ddf_lead_variant_index.toPandas()
     filtered_ddf_lead_variant_index_df['gnomad_nfe'] = filtered_ddf_lead_variant_index_df['af'].apply(lambda x: x.gnomad_nfe if hasattr(x, gnomad_af) else None)
     filtered_ddf_lead_variant_index_df = filtered_ddf_lead_variant_index_df.drop(['af','cadd'],axis=1)
-    filtered_ddf_lead_variant_index_df.to_csv(out, header=True, sep = '\t')
+    filtered_ddf_lead_variant_index_df.to_csv(out, header=True, sep = '\t', index = False)
