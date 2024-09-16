@@ -17,20 +17,22 @@ To run the program you need to use a sbatch script in the HPC. An example of sba
 #SBATCH --time=00:40:00
 
 source /ssu/gassu/miniconda3/etc/profile.d/conda.sh
-conda activate tiledb
-python v2g_dask_query.py -i variants_query.txt -o variants_anno_out.tsv
+conda activate sparkhpc
+
+python main.py --variants_query variants_query.txt variant_gene --out variants_anno_v2g_out.csv
+
+python main.py --variants_query variants_query.txt variant_disease --out variants_anno_v2d_out.csv
 ```
 
-This needs to be modified adding the preferred input and output files. The parameters used can be either using the options:
+This needs to be modified adding the preferred input and output files and the type of annotation that you want to use. The parameters used can be either using the options:
 
 ## Input
 
-Input can be given using either the -v or -t option:
+Input can be given using the --variants_query option:
 <details>
-<summary>Example of table with -v:</summary>
+<summary>Example of table with variants:</summary>
 <pre>
 head tests/variants_query.txt
-SNP_id
 1_154453788_C_T
 1_1022868_A_G
 1_2211079_A_C
@@ -43,34 +45,37 @@ SNP_id
 </pre>
 </details>
 
-<details>
-<summary>Example of table with -t:</summary>
-<pre>
-head tests/variants_query_table.txt
-chr_id,position,ref_allele,alt_allele
-1,154453788,C,T
-1,1022868,A,G
-1,2211079,A,C
-1,2293397,G,A
-1,6568959,A,AG
-1,8094061,TG,T
-1,8447713,G,A
-1,9283562,C,T
-1,9478595,G,C
-</pre>
-</details>
+## Type of annotation
 
-To run the program from a srun you can use also the script v2g_dask_query.py after loading the tiledb conda environment:
+Two  type of annotation can be used:
+    -   The variant to gene which will return all the scores that associate a variant with a gene for all the QTL types. This option is selected using --variant_gene
+    -   The variant to disease which return all the annotation that associate a variant with a trait from a GWAS.
 
-```
-conda activate tiledb
-python v2g_dask_query.py -t <variant-table> -o <output-file>
-```
+## Optional parameters
+
+In case the variant_disease option is selected the following optional parameters are available:
+
+    --tag which will match the query variants with the tag variants from OTG instead than using the lead ones (Default: false).
+
+    --gnomad_af which will return the allele frequency for the alternate allele from a specific population (Default: gnomad_nfe). The list of population availablefor this parameter are reported below
+
+### Populations for the --gnomad_af parameter
+    -   gnomad_nfe non-Finnish Europeans
+    -   gnomad_afr Africans
+    -   gnomad_amr North Americans
+    -   gnomad_asj Ashkenazi jew
+    -   gnomad_eas East Asians
+    -   gnomad_fin Finnish
+    -   gnomad_nfe_est non-Finnish East Europeans
+    -   gnomad_nfe_nwe non-Finnish North-Western Europeans
+    -   gnomad_nfe_seu non-Finnish South-Eastern Europeans
+    -   gnomad_nfe_onf other non-Finnish Europeans
+    -   gnomad_oth other
 
 ## Output
 
+### variant_gene option
 The output from the program look like the one described below when running the sbatch commands described above:
-
 
 ```
 SNP_id  gene_id chr_id  position        ref_allele      alt_allele      overall_scores  distance_score  fpred_max       fpred_label     dhs_scores  max_pchic_score  max_fantom5_score       max_eqtl_score  max_eqtl_feature        max_pqtl_score  max_pqtl_feature        max_sqtl_score  max_sqtl_feature     eqtl_scores     eqtl_features   pqtl_scores     pqtl_features   sqtl_scores     sqtl_features
@@ -85,5 +90,32 @@ SNP_id  gene_id chr_id  position        ref_allele      alt_allele      overall_
 10_100901494_G_T        ENSG00000107819 10      100901494       G       T       0.07303822937625754     7.707723138584862e-06   Na      Na      Na  Na       Na      6.790565417809094       eQTLGen-UBERON_0000178  Na      Na      Na      Na      [6.790565417809094]     ['eQTLGen-UBERON_0000178']  Na       Na      Na      Na
 ```
 
+### variant_disease option
+```
+study_id        lead_chrom      lead_pos        lead_ref        lead_alt        SNP_id  beta    beta_ci_lower   beta_ci_upper   pval    pmid    trait_reported  ancestry_initial        n_initial       chr_id  position  ref_allele      alt_allele      chr_id_b37      position_b37    rs_id   most_severe_consequence gene_id_any_distance    gene_id_any     gene_id_prot_coding_distance    gene_id_prot_coding     SNP_id  gnomad_nfe
+0       GCST008057      6       26267527        A       G       6_26267527_A_G  -0.0027123      -0.0033992016583159     -0.002025398341684      1e-14   PMID:30998689   Varicose veins  ['European=408455']     408455  626267527 A       G       6       26267755        rs7773004       downstream_gene_variant 3886    ENSG00000273983 3886    ENSG00000273983 6_26267527_A_G  0.4972663368914345
+1       NEALE2_3063_raw 19      55482069        G       T       19_55482069_G_T -0.0305323999999999     -0.0395691955999999     -0.0214956044   3.5439999999999996e-11          Forced expiratory volume in 1-second (fev1)       ['European=329404']     329404  19      55482069        G       T       19      55993436        rs147110934     missense_variant        3119    ENSG00000090971 3119    ENSG00000090971 19_55482069_G_T 0.020293495505023795
+2       NEALE2_23126_raw        19      55482069        G       T       19_55482069_G_T -0.0195978      -0.0263018624   -0.0128937375999999     1.00728e-08             Arm predicted mass (left)       ['European=354653']       354653  19      55482069        G       T       19      55993436        rs147110934     missense_variant        3119    ENSG00000090971 3119    ENSG00000090971 19_55482069_G_T 0.020293495505023795
+3       NEALE2_23105_raw        19      55482069        G       T       19_55482069_G_T -40.8364        -53.5117396     -28.1610604     2.71238e-10             Basal metabolic rate    ['European=354825']     354825  1955482069        G       T       19      55993436        rs147110934     missense_variant        3119    ENSG00000090971 3119    ENSG00000090971 19_55482069_G_T 0.020293495505023795
+4       NEALE2_23129_raw        19      55482069        G       T       19_55482069_G_T -0.189325       -0.238145268    -0.140504732    2.8999999999999996e-14          Trunk fat-free mass     ['European=354530']     354530    19      55482069        G       T       19      55993436        rs147110934     missense_variant        3119    ENSG00000090971 3119    ENSG00000090971 19_55482069_G_T 0.020293495505023795
+5       NEALE2_50_raw   10      79376373        C       A       10_79376373_C_A -0.207289       -0.236445568    -0.178132432    4.0060700000000003e-44          Standing height ['European=360388']     360388  10      79376373  C       A       10      81136129        rs4980067       intergenic_variant      28904   ENSG00000108179 28904   ENSG00000108179 10_79376373_C_A 0.5354218120369166
+6       NEALE2_23129_raw        10      79376373        C       A       10_79376373_C_A -0.0633598      -0.078337042    -0.0483825579999999     1.12115e-16             Trunk fat-free mass     ['European=354530']     354530    10      79376373        C       A       10      81136129        rs4980067       intergenic_variant      28904   ENSG00000108179 28904   ENSG00000108179 10_79376373_C_A 0.5354218120369166
+7       NEALE2_23105_raw        10      79376373        C       A       10_79376373_C_A -14.7126        -18.6007696     -10.8244304     1.21e-13                Basal metabolic rate    ['European=354825']     354825  1079376373        C       A       10      81136129        rs4980067       intergenic_variant      28904   ENSG00000108179 28904   ENSG00000108179 10_79376373_C_A 0.5354218120369166
+8       NEALE2_50_raw   2       232196106       T       C       2_232196106_T_C -0.615194       -0.718153192    -0.512234808    1.13096e-31             Standing height ['European=360388']     360388  2       232196106TC       2       233060816       rs77060225      intron_variant  182618  ENSG00000163283 182618  ENSG00000163283 2_232196106_T_C 0.022052146841354262
+```
 
+## Example running the standalone program
 
+To run the program from a cnode you can use also the script main.py after loading the sparkhpc conda environment as shown in the 2 examples below:
+
+```
+conda activate sparkhpc
+
+python main.py --variants_query tests/variants_query.txt variant_gene --out variant_gene_out.tsv
+```
+
+```
+conda activate sparkhpc
+
+python main.py --variants_query tests/variants_query.txt variant_disease --gnomad_af gnomad_nfe --out variant_disease
+```
