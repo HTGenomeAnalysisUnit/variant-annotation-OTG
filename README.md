@@ -9,7 +9,7 @@ To run the program you need to use a sbatch script in the HPC. An example of sba
 ```cat script/scheduler_annotation.sbatch```
 ```
 #!/bin/bash
-#SBATCH --job-name=v2g_annotate
+#SBATCH --job-name=v2dg_annotate
 #SBATCH --output=logfile_sbatch.txt
 #SBATCH --partition=cpuq
 #SBATCH --cpus-per-task=5
@@ -19,9 +19,8 @@ To run the program you need to use a sbatch script in the HPC. An example of sba
 source /ssu/gassu/miniconda3/etc/profile.d/conda.sh
 conda activate sparkhpc
 
-python main.py --variants_query variants_query.txt variant_gene --out variants_anno_v2g_out.csv
+python main.py --variants_query variants_query.txt variant_disease_gene --out variants_anno_out
 
-python main.py --variants_query variants_query.txt variant_disease --out variants_anno_v2d_out.csv
 ```
 
 This needs to be modified adding the preferred input and output files and the type of annotation that you want to use. The parameters used can be either using the options:
@@ -47,13 +46,13 @@ head tests/variants_query.txt
 
 ## Type of annotation
 
-Two  type of annotation can be used:
-    -   The variant to gene which will return all the scores that associate a variant with a gene for all the QTL types. This option is selected using --variant_gene
+Two  type of annotation are given using the option ```variant_disease_gene```:
+    -   The variant to gene which will return all the scores that associate a variant with a gene for all the QTL types.
     -   The variant to disease which return all the annotation that associate a variant with a trait from a GWAS.
 
 ## Optional parameters
 
-In case the variant_disease option is selected the following optional parameters are available:
+In the variant_disease_gene option the following optional parameters are available:
 
     --tag which will match the query variants with the tag variants from OTG instead than using the lead ones (Default: false).
 
@@ -74,7 +73,7 @@ In case the variant_disease option is selected the following optional parameters
 
 ## Output
 
-### variant_gene option
+### variant_gene output
 The output from the program look like the one described below when running the sbatch commands described above:
 
 ```
@@ -90,19 +89,21 @@ SNP_id  gene_id chr_id  position        ref_allele      alt_allele      overall_
 10_100901494_G_T        ENSG00000107819 10      100901494       G       T       0.07303822937625754     7.707723138584862e-06   Na      Na      Na  Na       Na      6.790565417809094       eQTLGen-UBERON_0000178  Na      Na      Na      Na      [6.790565417809094]     ['eQTLGen-UBERON_0000178']  Na       Na      Na      Na
 ```
 
-### variant_disease option
+### variant_disease output
 ```
-study_id        SNP_id  lead_chrom      lead_pos        lead_ref        lead_alt        tag_chrom       tag_pos tag_ref tag_alt beta    beta_ci_lower   beta_ci_upper   pval    pmid    trait_reported  ancestry_initial n_initial        chr_id  position        ref_allele      alt_allele      chr_id_b37      position_b37    rs_id   most_severe_consequence gene_id_any_distance    gene_id_any     gene_id_prot_coding_distance    gene_id_prot_coding       SNP_id  gnomad_nfe
-NEALE2_50_raw   9_91577228_G_A  9       91577228        G       A       9       91577228        G       A       0.14382 0.10678482      0.18085518      2.7000000000000002e-14          Standing height ['European=360388']       360388  9       91577228        G       A       9       94339510        rs9409609       intron_variant  153396  ENSG00000165030 153396  ENSG00000165030 9_91577228_G_A  0.1863075924724205
-FINNGEN_R6_I9_VARICVE   9_91577228_G_A  9       91451845        G       A       9       91577228        G       A                               5.6399999999999986e-12          Varicose veins  ['European=246160']     246160    9       91577228        G       A       9       94339510        rs9409609       intron_variant  153396  ENSG00000165030 153396  ENSG00000165030 9_91577228_G_A  0.1863075924724205
-NEALE2_23098_raw        16_89469480_C_T 16      90014315        T       C       16      89469480        C       T       -0.249332       -0.33572292     -0.16294108     1.54404e-08             Weight  ['European=354838']       354838  16      89469480        C       T       16      89535888        rs55637757      intron_variant  21081   ENSG00000167522 21081   ENSG00000167522 16_89469480_C_T 0.11210149642160053
-NEALE2_48_raw   16_89469480_C_T 16      89441563        G       C       16      89469480        C       T       0.179809        0.115385564     0.244232436     4.4914800000000005e-08          Waist circumference     ['European=360564']       360564  16      89469480        C       T       16      89535888        rs55637757      intron_variant  21081   ENSG00000167522 21081   ENSG00000167522 16_89469480_C_T 0.11210149642160053
-NEALE2_23119_raw        16_89469480_C_T 16      90058287        A       T       16      89469480        C       T       -0.279849       -0.37070774     -0.18899026     1.5727100000000005e-09          Arm fat percentage (right)        ['European=354760']     354760  16      89469480        C       T       16      89535888        rs55637757      intron_variant  21081   ENSG00000167522 21081   ENSG00000167522 16_89469480_C_T 0.11210149642160053
-NEALE2_20153_raw        19_55482069_G_T 19      55482069        G       T       19      55482069        G       T       -0.0201958      -0.0258601412   -0.0145314588   2.798e-12               Forced expiratory volume in 1-second (fev1), predicted    ['European=117241']     117241  19      55482069        G       T       19      55993436        rs147110934     missense_variant        3119    ENSG00000090971 3119    ENSG00000090971 19_55482069_G_T   0.020293495505023795
-GCST90000026    19_55482069_G_T 19      55482069        G       T       19      55482069        G       T       -0.0866151999999999     -0.1047197199999999     -0.0685106799999999     2.8e-22 PMID:33097823   Appendicular lean mass    ['European=205513']     205513  19      55482069        G       T       19      55993436        rs147110934     missense_variant        3119    ENSG00000090971 3119    ENSG00000090971 19_55482069_G_T 0.020293495505023795
-NEALE2_20022_raw        19_55482069_G_T 19      54219677        C       T       19      55482069        G       T       -0.0119093      -0.0159933323999999     -0.0078252676   1.0952600000000002e-08          Birth weight      ['European=205475']     205475  19      55482069        G       T       19      55993436        rs147110934     missense_variant        3119    ENSG00000090971 3119    ENSG00000090971 19_55482069_G_T 0.020293495505023795
-NEALE2_23113_raw        19_55482069_G_T 19      55500206        C       T       19      55482069        G       T       -0.0561493      -0.0737248748   -0.0385737252   3.8128200000000007e-10          Leg fat-free mass (right) ['European=354798']     354798  19      55482069        G       T       19      55993436        rs147110934     missense_variant        3119    ENSG00000090971 3119    ENSG00000090971 19_55482069_G_T 0.020293495505023795
+study_id        SNP_id  lead_chrom      lead_pos        lead_ref        lead_alt        beta    beta_ci_lower   beta_ci_upper   pval    pmid    trait_reported  ancestry_initial     n_initial       gene_id V2G_SCORE_MAX   gnomad_nfe
+NEALE2_50_raw   1_6568959_A_AG  1       6568959 A       AG      -0.130629       -0.174965376    -0.086292624    7.710480000000002e-09           Standing height ['European=360388']  360388  ENSG00000171680 0.23239436619718312
+NEALE2_20015_raw        1_8447713_G_A   1       8447713 G       A       0.0622522999999999      0.041171128     0.0833334719999999      7.1347300000000015e-09          Sitting height       ['European=360066']     360066  ENSG00000142599 0.2937625754527163
+NEALE2_1697     1_8447713_G_A   1       8447713 G       A       0.0132827999999999      0.0093519416    0.0172136583999999      3.5228999999999995e-11          Comparative height size at age 10    ['European=355331']     355331  ENSG00000142599 0.2937625754527163
+NEALE2_50_raw   1_8447713_G_A   1       8447713 G       A       0.151467        0.1149931639999999      0.187940836     3.9853399999999996e-16          Standing height ['European=360388']  360388  ENSG00000142599 0.2937625754527163
+NEALE2_50_raw   1_10148710_T_C  1       10148710        T       C       0.212667        0.163939832     0.261394168     1.1902e-17              Standing height ['European=360388']  360388  ENSG00000130939 0.29336016096579476
+NEALE2_20015_raw        1_10148710_T_C  1       10148710        T       C       0.0888988       0.060734384     0.117063216     6.15406e-10             Sitting height  ['European=360066']  360066  ENSG00000130939 0.29336016096579476
+NEALE2_50_raw   1_1022868_A_G   1       1022868 A       G       0.0908756999999999      0.0605976199999999      0.1211537799999999      4.04012e-09             Standing height      ['European=360388']     360388  ENSG00000187608 0.37344064386317904
+NEALE2_50_raw   1_8094061_TG_T  1       8094061 TG      T       -0.1170369999999999     -0.1545431679999999     -0.079530832    9.596650000000001e-10           Standing height      ['European=360388']     360388  ENSG00000116288 0.36720321931589534
+NEALE2_50_raw   1_2293397_G_A   1       2293397 G       A       0.106066        0.075624848     0.136507152     8.553e-12               Standing height ['European=360388'] 360388   ENSG00000157933 0.07987927565392354
 ```
+
+Please note for the v2d_table above that for each SNP_id only one gene is reported which is the one with the highest V2G score taken from the v2g_table.
 
 ## Example running the standalone program
 
@@ -111,11 +112,5 @@ To run the program from a cnode you can use also the script main.py after loadin
 ```
 conda activate sparkhpc
 
-python main.py --variants_query tests/variants_query.txt variant_gene --out variant_gene_out.tsv
-```
-
-```
-conda activate sparkhpc
-
-python main.py --variants_query tests/variants_query.txt variant_disease --gnomad_af gnomad_nfe --out variant_disease
-```
+python main.py --variants_query tests/variants_query.txt variant_disease_gene --out variant_gene_out
+``

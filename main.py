@@ -3,8 +3,9 @@ from pyspark.sql import SparkSession
 import pyspark.sql.functions as F
 import click
 import cloup
-from cli.variant_disease import variant_disease
-from cli.variant_gene import variant_gene
+from cli.variant_disease_gene import variant_disease_gene
+#from cli.variant_disease_gene import variant_disease
+
 
 @cloup.group(name="main", help="Open Targets Genetics annotation", no_args_is_help=True)
 @cloup.option_group(
@@ -48,8 +49,7 @@ def cli_init(ctx, app_name: str , spark_mem: str , spark_cpu: str, variants_quer
     return ctx.obj
     
 def main():
-    cli_init.add_command(variant_disease)
-    cli_init.add_command(variant_gene)
+    cli_init.add_command(variant_disease_gene)
     cli_init(obj={})
 
 if __name__ == "__main__":
