@@ -1,30 +1,9 @@
 import pyspark.sql.functions as F
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, FloatType, DoubleType
 from pyspark.sql.functions import col, broadcast, when
-import cloup
-import click
 
-@cloup.command("variant_disease_gene", no_args_is_help=True)
-@cloup.option_group(
-    "V2D parameters",
-    cloup.option(
-        "--gnomad_af", 
-        default="gnomad_nfe", 
-        help="population for which the allele frequency is to be retrieved. Check the README for a list of available populations."),
-    cloup.option(
-        "--tag",
-        default=False,
-        is_flag = True,
-        help="Flag indicating whether to match both for lead and tag variant. Default is false meaning only the lead variants will be considered."),
-    cloup.option(
-        "--out",
-        default="v2",
-        help="The name of the file where to store the results of the query.")
-)
-@click.pass_context
-def variant_disease_gene(ctx,  out: str, gnomad_af: str, tag: bool):
-    spark = ctx.obj['spark']
-    snp_values = ctx.obj['snp_list']
+def variant_disease_gene(spark_object, snp_values, out: str, gnomad_af: str, tag: bool):
+    spark = spark_object
 
     #Create V2G table
     print("Creating V2G table")
@@ -135,6 +114,6 @@ def variant_disease_gene(ctx,  out: str, gnomad_af: str, tag: bool):
     filtered_ddf_lead_variant_index = filtered_ddf_lead.join(variant_index_lead, filtered_ddf_lead.SNP_id == variant_index_lead.SNP_id_index, how='inner').drop("SNP_id_index")
     filtered_ddf_lead_variant_index_v2g = filtered_ddf_lead_variant_index.join(aggregated_df_subset, filtered_ddf_lead_variant_index.SNP_id == aggregated_df_subset.SNP_id_v2g, how='inner').drop("SNP_id_v2g")
     filtered_ddf_lead_variant_index_df = filtered_ddf_lead_variant_index_v2g.toPandas()
-    filtered_ddf_lead_variant_index_df[gnomad_af] = filtered_ddf_lead_variant_index_df['af'].apply(lambda x: x.gnomad_af if hasattr(x, gnomad_af) else None)
+    filtered_ddf_lead_variant_index_df['gnomad_nfe'] = filtered_ddf_lead_variant_index_df['af'].apply(lambda x: x[gnomad_af] if hasattr(x, gnomad_af) else None)
     filtered_ddf_lead_variant_index_df = filtered_ddf_lead_variant_index_df.drop(['af'],axis=1)
     filtered_ddf_lead_variant_index_df.to_csv(out + "_v2d.tsv", header=True, sep = '\t', index = False)

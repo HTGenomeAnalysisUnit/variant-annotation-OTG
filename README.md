@@ -19,7 +19,7 @@ To run the program you need to use a sbatch script in the HPC. An example of sba
 source /ssu/gassu/miniconda3/etc/profile.d/conda.sh
 conda activate sparkhpc
 
-python main.py --variants_query variants_query.txt variant_disease_gene --out variants_anno_out
+python main.py --variants_query variants_query.txt --out variants_anno_out
 
 ```
 
@@ -46,7 +46,7 @@ head tests/variants_query.txt
 
 ## Type of annotation
 
-Two  type of annotation are given using the option ```variant_disease_gene```:
+Two  type of annotation are given:
     -   The variant to gene which will return all the scores that associate a variant with a gene for all the QTL types.
     -   The variant to disease which return all the annotation that associate a variant with a trait from a GWAS.
 

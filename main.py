@@ -1,35 +1,23 @@
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
 import pyspark.sql.functions as F
-import click
-import cloup
+import argparse
 from cli.variant_disease_gene import variant_disease_gene
 #from cli.variant_disease_gene import variant_disease
 
+parser = argparse.ArgumentParser(
+                    prog='main',
+                    description="Open Targets Genetics annotation")
+parser.add_argument('--app_name', type=str, default="OTG Annotation", help='name to give to the spark application')
+parser.add_argument('--spark_mem', type=str, default="12g", help='Amount of total memory to give to spark')
+parser.add_argument('--spark_cpu', type=str, default="10", help='Total number of cpu to use')
+parser.add_argument('--variants_query', type=str, default=None, help='Path of a txt file storing the variants to investigate in the format chr_pos_ref_alt.')
+parser.add_argument('--gnomad_af', type=str, default="gnomad_nfe", help='Population for which the allele frequency is to be retrieved. Check the README for a list of available populations.')
+parser.add_argument('--tag', type=bool, default=False, help='Flag indicating whether to match both for lead and tag variant. Default is false meaning only the lead variants will be considered.')
+parser.add_argument('--out', type=str, default="v2dg_out", help='The name of the file where to store the results of the query.')
+args = vars(parser.parse_args())
 
-@cloup.group(name="main", help="Open Targets Genetics annotation", no_args_is_help=True)
-@cloup.option_group(
-    "Spark parameters",
-    cloup.option(
-        "--app_name", 
-        default="OTG Annotation", 
-        help="Path of a txt file storing the variants to investigate in the format chr_pos_ref_alt."),
-    cloup.option(
-        "--spark_mem",
-        default="12g",
-        help="The name of the file where to store the results of the query."),
-    cloup.option(
-        "--spark_cpu",
-        default="10",
-        help="The name of the file where to store the results of the query."),
-    cloup.option(
-        "--variants_query", 
-        default="variants to query on OTG", 
-        help="Path of a txt file storing the variants to investigate in the format chr_pos_ref_alt.")
-)
-
-@click.pass_context
-def cli_init(ctx, app_name: str , spark_mem: str , spark_cpu: str, variants_query: str) -> SparkSession:
+def main(app_name: str , spark_mem: str , spark_cpu: str, variants_query: str,out: str, gnomad_af: str, tag: bool):
     conf = (
         SparkConf()
         .set("spark.driver.memory", spark_mem)
@@ -43,14 +31,14 @@ def cli_init(ctx, app_name: str , spark_mem: str , spark_cpu: str, variants_quer
     
     variant_query = spark_session.read.csv(variants_query)
     snp_values = variant_query.withColumn("SNP_id",F.col("_c0")).drop("_c0")
-    # Passing the Spark session and variants into the context
-    ctx.obj = {"spark": spark_session,
-                "snp_list": snp_values}  
-    return ctx.obj
-    
-def main():
-    cli_init.add_command(variant_disease_gene)
-    cli_init(obj={})
+    variant_disease_gene(spark_object = spark_session, snp_values = snp_values, out = out, gnomad_af = gnomad_af, tag = tag)
 
 if __name__ == "__main__":
-    main()
+    main(app_name = args['app_name'],
+        spark_mem = args['spark_mem'],
+        spark_cpu = args['spark_cpu'],
+        variants_query = args['variants_query'],
+        out = args['out'],
+        gnomad_af = args['gnomad_af'],
+        tag = args['tag']
+        )
