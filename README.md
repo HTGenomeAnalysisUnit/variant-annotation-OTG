@@ -19,7 +19,7 @@ To run the program you need to use a sbatch script in the HPC. An example of sba
 source /ssu/gassu/miniconda3/etc/profile.d/conda.sh
 conda activate sparkhpc
 
-python main.py --variants_query variants_query.txt --out variants_anno_out
+python main.py --variants_query tests/variants_query.txt --out variants_anno_out
 
 ```
 
