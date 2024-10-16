@@ -24,10 +24,10 @@ def main(app_name: str , spark_mem: str , spark_cpu: str, variants_query: str,ou
         .set("spark.driver.memory", spark_mem)
     )
     username = os.getenv('USER')
-
+    cpus = args['spark_cpu']
     spark_session = SparkSession\
         .builder\
-        .master(f"local[{args["spark_cpu"]}]")\
+        .master(f"local[{cpus}]")\
         .appName("test") \
         .config("spark.local.dir", f"/scratch/{username}/tmp_pyspark") \
         .getOrCreate()
