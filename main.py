@@ -3,6 +3,7 @@ from pyspark.sql import SparkSession
 import pyspark.sql.functions as F
 import argparse
 from cli.variant_disease_gene import variant_disease_gene
+import os
 #from cli.variant_disease_gene import variant_disease
 
 parser = argparse.ArgumentParser(
@@ -22,11 +23,13 @@ def main(app_name: str , spark_mem: str , spark_cpu: str, variants_query: str,ou
         SparkConf()
         .set("spark.driver.memory", spark_mem)
     )
+    username = os.getenv('USER')
+
     spark_session = SparkSession\
         .builder\
-        .master(f"local[*]")\
+        .master(f"local[{args["spark_cpu"]}]")\
         .appName("test") \
-        .config("spark.local.dir", "/scratch/bruno.ariano/tmp_pyspark") \
+        .config("spark.local.dir", f"/scratch/{username}/tmp_pyspark") \
         .getOrCreate()
     
     variant_query = spark_session.read.csv(variants_query)
